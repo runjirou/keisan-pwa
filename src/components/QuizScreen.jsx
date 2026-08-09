@@ -107,7 +107,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
     return (
       <div
         style={{
-          minHeight: "100vh",
+          minHeight: "100dvh",
           width: "100%",
           display: "flex",
           flexDirection: "column",
@@ -185,7 +185,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100dvh",
         width: "100%",
         display: "flex",
         flexDirection: "column",
@@ -193,6 +193,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
         justifyContent: "space-between",
         padding: "24px 24px 32px",
         boxSizing: "border-box",
+        overflowY: "auto",
       }}
     >
       {/* 経過タイマー（左上） */}
@@ -244,12 +245,13 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
       </div>
 
       {/* フラッシュカード */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}>
+      <div style={{ flex: 1, minHeight: 0, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}>
         <div
           style={{
             position: "relative",
             width: "100%",
             maxWidth: 380,
+            maxHeight: "100%",
             aspectRatio: "4 / 3",
             backgroundColor: COLORS.cardBg,
             borderRadius: 28,
@@ -259,6 +261,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
             alignItems: "center",
             justifyContent: "center",
             transition: "border-color 0.2s",
+            boxSizing: "border-box",
           }}
         >
           <div style={{ position: "absolute", top: 16, left: 16, width: 12, height: 12, borderRadius: "50%", backgroundColor: COLORS.paperLine }} />

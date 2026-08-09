@@ -7,9 +7,18 @@ export function todayStr() {
 }
 
 function genNoCarry() {
-  // 先に答え（2〜9）を均等に選んでから a, b を決めることで、
-  // 答えが9に偏らないようにする
-  const answer = Math.floor(Math.random() * 8) + 2; // 2-9
+  // 答えs（2〜9）の組み合わせ数は s-1 通り（例: 2→1+1の1通り、9→1+8〜8+1の8通り）。
+  // 答えを均等に選ぶと組み合わせ数が少ない答え（1+1など）が相対的に出やすくなるため、
+  // 組み合わせ数に比例した重みで答えを選ぶことで、数字の組み合わせ全体が均等に出題されるようにする
+  let r = Math.random() * 36; // 1+2+...+8 = 36
+  let answer = 2;
+  for (let weight = 1; weight <= 8; weight++) {
+    if (r < weight) {
+      answer = weight + 1;
+      break;
+    }
+    r -= weight;
+  }
   const a = Math.floor(Math.random() * (answer - 1)) + 1; // 1 〜 answer-1
   const b = answer - a;
   return { a, b, answer };

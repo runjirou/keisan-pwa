@@ -135,15 +135,12 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
           <span style={{ fontFamily: FONT_DISPLAY, fontSize: 13, fontWeight: 700, opacity: 0.75, color: fg }}>
             {levelMeta.label} ・ プリント かんりょう！
           </span>
-          <span style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 700, color: fg }}>
-            {label}
-          </span>
 
           <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
             <div style={statRowStyle}>
               <Check size={22} strokeWidth={3} color={fg} />
               <span style={statTextStyle}>
-                せいかい {correctCount}/{questionsPerSheet}もん
+                せいかい {correctCount}/{questionsPerSheet}もん ・ {label}
               </span>
             </div>
             <div style={statRowStyle}>

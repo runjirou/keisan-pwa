@@ -1,5 +1,6 @@
-import { Play } from "lucide-react";
-import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET } from "../constants";
+import { useState } from "react";
+import { Play, User } from "lucide-react";
+import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH } from "../constants";
 import { scoreMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 import ToggleSwitch from "./ToggleSwitch";
@@ -14,7 +15,25 @@ export default function MenuScreen({
   onReset,
   questionsPerSheet,
   onChangeQuestionsPerSheet,
+  users,
+  currentUser,
+  onSwitchUser,
+  onCreateUser,
 }) {
+  const [newUserName, setNewUserName] = useState("");
+  const [addUserError, setAddUserError] = useState("");
+  const mySheets = sheets.filter((s) => s.user === currentUser);
+
+  const handleAddUser = () => {
+    const result = onCreateUser(newUserName);
+    if (result.ok) {
+      setNewUserName("");
+      setAddUserError("");
+    } else {
+      setAddUserError(result.error);
+    }
+  };
+
   return (
     <div
       style={{
@@ -28,6 +47,21 @@ export default function MenuScreen({
       }}
     >
       <div style={{ width: "100%", maxWidth: 420 }}>
+        {/* 現在のユーザー表示 */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            marginBottom: 8,
+          }}
+        >
+          <User size={13} color={COLORS.inkSoft} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.inkSoft }}>
+            {currentUser} さん
+          </span>
+        </div>
+
         <h1
           style={{
             fontFamily: FONT_DISPLAY,
@@ -47,7 +81,7 @@ export default function MenuScreen({
         {/* きょうの枚数（レベル別） */}
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           {LEVELS.map((lv) => {
-            const count = sheets.filter((s) => s.level === lv.id && s.date === todayStr()).length;
+            const count = mySheets.filter((s) => s.level === lv.id && s.date === todayStr()).length;
             return (
               <div
                 key={lv.id}
@@ -158,7 +192,7 @@ export default function MenuScreen({
         {/* レベル別 結果一覧 */}
         <div style={{ width: "100%", marginTop: 40, display: "flex", flexDirection: "column", gap: 32 }}>
           {LEVELS.map((lv) => {
-            const lvSheets = sheets.filter((s) => s.level === lv.id);
+            const lvSheets = mySheets.filter((s) => s.level === lv.id);
             return (
               <div key={lv.id}>
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
@@ -245,6 +279,81 @@ export default function MenuScreen({
             gap: 12,
           }}
         >
+          {/* アカウントの切り替え・作成 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+              アカウント
+            </span>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {users.map((u) => (
+                <button
+                  key={u}
+                  onClick={() => onSwitchUser(u)}
+                  style={{
+                    fontFamily: FONT_DISPLAY,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    borderRadius: 999,
+                    border: `2px solid ${u === currentUser ? COLORS.teal : COLORS.keyBorder}`,
+                    backgroundColor: u === currentUser ? COLORS.levelSelBg : "#FFFFFF",
+                    color: COLORS.ink,
+                    padding: "5px 12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {u}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              <input
+                value={newUserName}
+                onChange={(e) => {
+                  setNewUserName(e.target.value);
+                  setAddUserError("");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddUser();
+                }}
+                maxLength={MAX_USER_NAME_LENGTH}
+                placeholder="あたらしいなまえ"
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontFamily: FONT_BODY,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  padding: "8px 10px",
+                  borderRadius: 10,
+                  border: `2px solid ${COLORS.keyBorder}`,
+                  boxSizing: "border-box",
+                }}
+              />
+              <button
+                onClick={handleAddUser}
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  borderRadius: 10,
+                  border: "none",
+                  backgroundColor: COLORS.teal,
+                  color: "#FFFFFF",
+                  padding: "8px 14px",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              >
+                ついか
+              </button>
+            </div>
+            {addUserError && (
+              <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.coral }}>
+                {addUserError}
+              </span>
+            )}
+          </div>
+
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
               タイマーを表示

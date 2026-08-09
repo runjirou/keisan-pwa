@@ -31,3 +31,5 @@ export const LEVELS = [
 
 // レベル別のタイム基準（秒）：この秒数以内なら「超すごい！」
 export const TIME_THRESHOLDS = { 1: 40, 2: 60 };
+
+export const MAX_USER_NAME_LENGTH = 10;

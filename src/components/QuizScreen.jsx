@@ -4,7 +4,7 @@ import { COLORS, FONT_DISPLAY, LEVELS } from "../constants";
 import { generateProblem, scoreMeta, timeMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 
-export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack, questionsPerSheet }) {
+export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack, questionsPerSheet, currentUser }) {
   const [index, setIndex] = useState(0); // 0-19
   const [problem, setProblem] = useState(() => generateProblem(level));
   const [buffer, setBuffer] = useState("");
@@ -66,10 +66,10 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
       if (isLast) {
         const seconds = Math.round((Date.now() - startTimeRef.current) / 1000);
         const date = todayStr();
-        const countBefore = sheets.filter((s) => s.level === level && s.date === date).length;
+        const countBefore = sheets.filter((s) => s.level === level && s.date === date && s.user === currentUser).length;
         setFinalSeconds(seconds);
         setTodayCount(countBefore + 1);
-        onRecord({ level, score: nextCorrectCount, seconds, date, total: questionsPerSheet });
+        onRecord({ level, score: nextCorrectCount, seconds, date, total: questionsPerSheet, user: currentUser });
         setDone(true);
       } else {
         setIndex((i) => i + 1);
@@ -79,7 +79,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
         setLocked(false);
       }
     }, isCorrect ? 500 : 900);
-  }, [locked, buffer, problem, index, level, correctCount, sheets, onRecord, questionsPerSheet]);
+  }, [locked, buffer, problem, index, level, correctCount, sheets, onRecord, questionsPerSheet, currentUser]);
 
   const cardBorderColor =
     feedback === "correct" ? COLORS.green : feedback === "wrong" ? COLORS.coral : COLORS.cardBorderDefault;

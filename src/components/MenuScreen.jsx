@@ -4,6 +4,7 @@ import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUEST
 import { scoreMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 import ToggleSwitch from "./ToggleSwitch";
+import DailyCalendar from "./DailyCalendar";
 
 export default function MenuScreen({
   sheets,
@@ -265,6 +266,11 @@ export default function MenuScreen({
               </div>
             );
           })}
+        </div>
+
+        {/* ひにちの きろく（カレンダー） */}
+        <div style={{ width: "100%", marginTop: 40 }}>
+          <DailyCalendar sheets={mySheets} />
         </div>
 
         {/* せってい（フッター・小さめ表示） */}

@@ -24,9 +24,10 @@ The app is split by responsibility:
 
 - `src/App.jsx` — root component (`KeisanApp`, default export). Owns top-level state (`screen`: `'menu' | 'quiz'`, `sheets`, `showTimer`, `questionsPerSheet`, `users`, `currentUser`), loads/saves persistence, and renders `UserSetupScreen`/`MenuScreen`/`QuizScreen`.
 - `src/components/UserSetupScreen.jsx` — first-run screen shown whenever `users` is empty; takes a name and calls `onCreateUser`.
-- `src/components/MenuScreen.jsx` — current-user badge, level picker, today's sheet counts, past results grid, the reset-records button, and a footer block (account switcher/creator, timer toggle, debug question-count slider).
+- `src/components/MenuScreen.jsx` — current-user badge, level picker, today's sheet counts, past results grid, a monthly `DailyCalendar`, the reset-records button, and a footer block (account switcher/creator, timer toggle, debug question-count slider).
 - `src/components/QuizScreen.jsx` — runs one sheet of `questionsPerSheet` questions (prop, not a constant) for `currentUser`, a numeric keypad, correct/wrong flash feedback, elapsed-time tracking, then a results screen.
 - `src/components/ToggleSwitch.jsx` — the timer on/off switch used by `MenuScreen`; takes a `small` prop for the compact footer variant.
+- `src/components/DailyCalendar.jsx` — self-contained month calendar (own prev/next-month state) that counts `sheets` per `date` and renders one cell per day; placed below the per-level results grid in `MenuScreen`.
 - `src/constants.js` — `COLORS`, `FONT_DISPLAY`/`FONT_BODY`, `LEVELS`, `QUESTIONS_PER_SHEET` (default/max sheet size), `MIN_QUESTIONS_PER_SHEET` (debug-slider floor), `TIME_THRESHOLDS`, `MAX_USER_NAME_LENGTH`.
 - `src/gameLogic.js` — `generateProblem(level)` (picks `genNoCarry()`/`genCarry()` internally), `scoreMeta(score, total)`/`timeMeta(seconds, level)` (map a score/time to a badge color+label), `todayStr()`.
 - `src/pressHandlers.js` — `pressHandlers()`, the pressed-button shadow/translate effect shared by every button.

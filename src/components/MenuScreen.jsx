@@ -220,7 +220,7 @@ export default function MenuScreen({
                     </p>
                   </div>
                 ) : (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
                     {lvSheets.map((sheet, i) => {
                       const total = sheet.total ?? QUESTIONS_PER_SHEET;
                       const { bg, fg } = scoreMeta(sheet.score, total);

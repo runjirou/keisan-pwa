@@ -7,11 +7,12 @@ export function todayStr() {
 }
 
 function genNoCarry() {
-  const a = Math.floor(Math.random() * 9) + 1; // 1-9
-  const maxB = 9 - a;
-  if (maxB < 1) return genNoCarry();
-  const b = Math.floor(Math.random() * maxB) + 1;
-  return { a, b, answer: a + b };
+  // 先に答え（2〜9）を均等に選んでから a, b を決めることで、
+  // 答えが9に偏らないようにする
+  const answer = Math.floor(Math.random() * 8) + 2; // 2-9
+  const a = Math.floor(Math.random() * (answer - 1)) + 1; // 1 〜 answer-1
+  const b = answer - a;
+  return { a, b, answer };
 }
 
 function genCarry() {

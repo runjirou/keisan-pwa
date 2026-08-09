@@ -1,12 +1,17 @@
 import { COLORS } from "../constants";
 
-export default function ToggleSwitch({ checked, onChange }) {
+export default function ToggleSwitch({ checked, onChange, small }) {
+  const width = small ? 34 : 46;
+  const height = small ? 20 : 26;
+  const thumbSize = small ? 14 : 20;
+  const inset = small ? 3 : 3;
+
   return (
     <button
       onClick={() => onChange(!checked)}
       style={{
-        width: 46,
-        height: 26,
+        width,
+        height,
         borderRadius: 999,
         border: "none",
         backgroundColor: checked ? COLORS.teal : COLORS.keyBorder,
@@ -19,10 +24,10 @@ export default function ToggleSwitch({ checked, onChange }) {
       <div
         style={{
           position: "absolute",
-          top: 3,
-          left: checked ? 23 : 3,
-          width: 20,
-          height: 20,
+          top: inset,
+          left: checked ? width - thumbSize - inset : inset,
+          width: thumbSize,
+          height: thumbSize,
           borderRadius: "50%",
           backgroundColor: "#FFFFFF",
           transition: "left 0.15s",

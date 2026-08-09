@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { COLORS, FONT_BODY } from "./constants";
+import { COLORS, FONT_BODY, QUESTIONS_PER_SHEET } from "./constants";
 import { loadSheets, saveSheets, loadSettings, saveSettings } from "./storage";
 import MenuScreen from "./components/MenuScreen";
 import QuizScreen from "./components/QuizScreen";
@@ -8,22 +8,29 @@ export default function KeisanApp() {
   const [screen, setScreen] = useState("menu"); // 'menu' | 'quiz'
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [activeLevel, setActiveLevel] = useState(1);
-  const [sheets, setSheets] = useState(() => loadSheets()); // [{level, score, seconds, date}]
+  const [sheets, setSheets] = useState(() => loadSheets()); // [{level, score, seconds, date, total}]
   const [showTimer, setShowTimer] = useState(() => {
     const settings = loadSettings();
     return typeof settings.showTimer === "boolean" ? settings.showTimer : true;
   });
+  // デバッグ用：1枚あたりの出題数（スライダーで変更可能）
+  const [questionsPerSheet, setQuestionsPerSheet] = useState(() => {
+    const settings = loadSettings();
+    return typeof settings.questionsPerSheet === "number" ? settings.questionsPerSheet : QUESTIONS_PER_SHEET;
+  });
+  const [activeQuestionsPerSheet, setActiveQuestionsPerSheet] = useState(QUESTIONS_PER_SHEET);
 
   useEffect(() => {
     saveSheets(sheets);
   }, [sheets]);
 
   useEffect(() => {
-    saveSettings({ showTimer });
-  }, [showTimer]);
+    saveSettings({ showTimer, questionsPerSheet });
+  }, [showTimer, questionsPerSheet]);
 
   const handleStart = (level) => {
     setActiveLevel(level);
+    setActiveQuestionsPerSheet(questionsPerSheet);
     setScreen("quiz");
   };
 
@@ -67,6 +74,8 @@ export default function KeisanApp() {
           showTimer={showTimer}
           onToggleTimer={setShowTimer}
           onReset={handleReset}
+          questionsPerSheet={questionsPerSheet}
+          onChangeQuestionsPerSheet={setQuestionsPerSheet}
         />
       )}
       {screen === "quiz" && (
@@ -76,6 +85,7 @@ export default function KeisanApp() {
           sheets={sheets}
           onRecord={handleRecord}
           onBack={handleBack}
+          questionsPerSheet={activeQuestionsPerSheet}
         />
       )}
     </div>

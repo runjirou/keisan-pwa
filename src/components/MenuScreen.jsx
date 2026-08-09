@@ -1,10 +1,20 @@
 import { Play } from "lucide-react";
-import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET } from "../constants";
+import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET } from "../constants";
 import { scoreMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 import ToggleSwitch from "./ToggleSwitch";
 
-export default function MenuScreen({ sheets, selectedLevel, onSelectLevel, onStart, showTimer, onToggleTimer, onReset }) {
+export default function MenuScreen({
+  sheets,
+  selectedLevel,
+  onSelectLevel,
+  onStart,
+  showTimer,
+  onToggleTimer,
+  onReset,
+  questionsPerSheet,
+  onChangeQuestionsPerSheet,
+}) {
   return (
     <div
       style={{
@@ -120,31 +130,8 @@ export default function MenuScreen({ sheets, selectedLevel, onSelectLevel, onSta
           {...pressHandlers(`0 5px 0 ${COLORS.tealDark}`)}
         >
           <Play size={22} fill="#FFFFFF" />
-          プリントをはじめる（20もん）
+          プリントをはじめる（{questionsPerSheet}もん）
         </button>
-
-        {/* せってい */}
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderRadius: 16,
-            border: `2px solid ${COLORS.keyBorder}`,
-            padding: "12px 16px",
-          }}
-        >
-          <div>
-            <div style={{ fontFamily: FONT_DISPLAY, fontSize: 14, fontWeight: 700, color: COLORS.ink }}>
-              タイマーを表示
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint, marginTop: 2 }}>
-              出題中に左上へ経過時間を表示します
-            </div>
-          </div>
-          <ToggleSwitch checked={showTimer} onChange={onToggleTimer} />
-        </div>
 
         <button
           onClick={() => {
@@ -200,7 +187,8 @@ export default function MenuScreen({ sheets, selectedLevel, onSelectLevel, onSta
                 ) : (
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
                     {lvSheets.map((sheet, i) => {
-                      const { bg, fg } = scoreMeta(sheet.score);
+                      const total = sheet.total ?? QUESTIONS_PER_SHEET;
+                      const { bg, fg } = scoreMeta(sheet.score, total);
                       return (
                         <div
                           key={i}
@@ -233,7 +221,7 @@ export default function MenuScreen({ sheets, selectedLevel, onSelectLevel, onSta
                             No.{i + 1}
                           </span>
                           <span style={{ fontFamily: FONT_DISPLAY, fontSize: 16, fontWeight: 700, color: fg }}>
-                            {sheet.score}/{QUESTIONS_PER_SHEET}
+                            {sheet.score}/{total}
                           </span>
                         </div>
                       );
@@ -243,6 +231,45 @@ export default function MenuScreen({ sheets, selectedLevel, onSelectLevel, onSta
               </div>
             );
           })}
+        </div>
+
+        {/* せってい（フッター・小さめ表示） */}
+        <div
+          style={{
+            width: "100%",
+            marginTop: 32,
+            paddingTop: 16,
+            borderTop: `1px solid ${COLORS.paperLine}`,
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+              タイマーを表示
+            </span>
+            <ToggleSwitch checked={showTimer} onChange={onToggleTimer} small />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+                でばっぐ：出題数
+              </span>
+              <span style={{ fontFamily: FONT_DISPLAY, fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+                {questionsPerSheet}もん
+              </span>
+            </div>
+            <input
+              type="range"
+              min={MIN_QUESTIONS_PER_SHEET}
+              max={QUESTIONS_PER_SHEET}
+              value={questionsPerSheet}
+              onChange={(e) => onChangeQuestionsPerSheet(Number(e.target.value))}
+              style={{ width: "100%", height: 14, accentColor: COLORS.teal }}
+            />
+          </div>
         </div>
       </div>
     </div>

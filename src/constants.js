@@ -21,7 +21,8 @@ export const COLORS = {
 export const FONT_DISPLAY = "'Fredoka', 'Nunito', sans-serif";
 export const FONT_BODY = "'Nunito', 'Hiragino Maru Gothic ProN', sans-serif";
 
-export const QUESTIONS_PER_SHEET = 20;
+export const QUESTIONS_PER_SHEET = 20; // デフォルト・スライダーの最大値
+export const MIN_QUESTIONS_PER_SHEET = 1; // デバッグ用スライダーの最小値
 
 export const LEVELS = [
   { id: 1, label: "レベル1", sub: "たしざん（くりあがりなし）" },

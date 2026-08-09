@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Check, X, Delete, Clock, Calendar } from "lucide-react";
-import { COLORS, FONT_DISPLAY, LEVELS, QUESTIONS_PER_SHEET } from "../constants";
+import { COLORS, FONT_DISPLAY, LEVELS } from "../constants";
 import { generateProblem, scoreMeta, timeMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 
-export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack }) {
+export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack, questionsPerSheet }) {
   const [index, setIndex] = useState(0); // 0-19
   const [problem, setProblem] = useState(() => generateProblem(level));
   const [buffer, setBuffer] = useState("");
@@ -60,7 +60,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
     if (isCorrect) setCorrectCount(nextCorrectCount);
     setFeedback(isCorrect ? "correct" : "wrong");
 
-    const isLast = index + 1 >= QUESTIONS_PER_SHEET;
+    const isLast = index + 1 >= questionsPerSheet;
 
     setTimeout(() => {
       if (isLast) {
@@ -69,7 +69,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
         const countBefore = sheets.filter((s) => s.level === level && s.date === date).length;
         setFinalSeconds(seconds);
         setTodayCount(countBefore + 1);
-        onRecord({ level, score: nextCorrectCount, seconds, date });
+        onRecord({ level, score: nextCorrectCount, seconds, date, total: questionsPerSheet });
         setDone(true);
       } else {
         setIndex((i) => i + 1);
@@ -79,13 +79,13 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
         setLocked(false);
       }
     }, isCorrect ? 500 : 900);
-  }, [locked, buffer, problem, index, level, correctCount, sheets, onRecord]);
+  }, [locked, buffer, problem, index, level, correctCount, sheets, onRecord, questionsPerSheet]);
 
   const cardBorderColor =
     feedback === "correct" ? COLORS.green : feedback === "wrong" ? COLORS.coral : COLORS.cardBorderDefault;
 
   if (done) {
-    const { bg, fg, label } = scoreMeta(correctCount);
+    const { bg, fg, label } = scoreMeta(correctCount, questionsPerSheet);
     const { label: timeLabel } = timeMeta(finalSeconds, level);
 
     const statRowStyle = {
@@ -143,7 +143,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
             <div style={statRowStyle}>
               <Check size={22} strokeWidth={3} color={fg} />
               <span style={statTextStyle}>
-                せいかい {correctCount}/{QUESTIONS_PER_SHEET}もん
+                せいかい {correctCount}/{questionsPerSheet}もん
               </span>
             </div>
             <div style={statRowStyle}>
@@ -230,7 +230,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
             {levelMeta.label}
           </span>
           <span style={{ fontFamily: FONT_DISPLAY, fontSize: 14, fontWeight: 700, color: COLORS.inkSoft }}>
-            もんだい {index + 1} / {QUESTIONS_PER_SHEET}
+            もんだい {index + 1} / {questionsPerSheet}
           </span>
         </div>
         <div style={{ width: "100%", height: 10, borderRadius: 999, backgroundColor: COLORS.paperLine, overflow: "hidden" }}>
@@ -240,7 +240,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
               borderRadius: 999,
               backgroundColor: COLORS.teal,
               transition: "width 0.3s",
-              width: `${((index + (feedback ? 1 : 0)) / QUESTIONS_PER_SHEET) * 100}%`,
+              width: `${((index + (feedback ? 1 : 0)) / questionsPerSheet) * 100}%`,
             }}
           />
         </div>

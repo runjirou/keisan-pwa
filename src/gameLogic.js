@@ -8,16 +8,19 @@ export function todayStr() {
 
 function genNoCarry() {
   // 答えs（2〜9）の組み合わせ数は s-1 通り（例: 2→1+1の1通り、9→1+8〜8+1の8通り）。
-  // 答えを均等に選ぶと組み合わせ数が少ない答え（1+1など）が相対的に出やすくなるため、
-  // 組み合わせ数に比例した重みで答えを選ぶことで、数字の組み合わせ全体が均等に出題されるようにする
-  let r = Math.random() * 36; // 1+2+...+8 = 36
+  // 組み合わせ数にそのまま比例させると重みの差が最大8倍まで開き、1+1のような
+  // 組み合わせ数が少ない答えが出にくくなりすぎるため、平方根を取って傾斜を緩める
+  // （差が約1〜2.8倍に圧縮され、少ない答えも出やすさを保ちつつ多い答えへの偏りも抑える）
+  const weights = [1, 2, 3, 4, 5, 6, 7, 8].map(Math.sqrt); // 答え2〜9 に対応
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  let r = Math.random() * total;
   let answer = 2;
-  for (let weight = 1; weight <= 8; weight++) {
-    if (r < weight) {
-      answer = weight + 1;
+  for (let i = 0; i < weights.length; i++) {
+    if (r < weights[i]) {
+      answer = i + 2;
       break;
     }
-    r -= weight;
+    r -= weights[i];
   }
   const a = Math.floor(Math.random() * (answer - 1)) + 1; // 1 〜 answer-1
   const b = answer - a;

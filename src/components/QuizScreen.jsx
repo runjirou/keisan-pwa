@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Check, X, Delete, Clock } from "lucide-react";
-import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET } from "../constants";
+import { Check, X, Delete, Clock, Calendar } from "lucide-react";
+import { COLORS, FONT_DISPLAY, LEVELS, QUESTIONS_PER_SHEET } from "../constants";
 import { generateProblem, scoreMeta, timeMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 
@@ -86,6 +86,24 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
 
   if (done) {
     const { bg, fg, label } = scoreMeta(correctCount);
+    const { label: timeLabel } = timeMeta(finalSeconds, level);
+
+    const statRowStyle = {
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      borderRadius: 16,
+      padding: "14px 18px",
+      backgroundColor: "rgba(255,255,255,0.4)",
+    };
+    const statTextStyle = {
+      fontFamily: FONT_DISPLAY,
+      fontSize: 18,
+      fontWeight: 700,
+      color: fg,
+    };
+
     return (
       <div
         style={{
@@ -104,61 +122,42 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack 
             width: "100%",
             maxWidth: 380,
             borderRadius: 28,
-            padding: "48px 0",
+            padding: "40px 28px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 12,
+            gap: 8,
             backgroundColor: bg,
             boxShadow: "0 8px 0 rgba(0,0,0,0.08)",
+            boxSizing: "border-box",
           }}
         >
           <span style={{ fontFamily: FONT_DISPLAY, fontSize: 13, fontWeight: 700, opacity: 0.75, color: fg }}>
             {levelMeta.label} ・ プリント かんりょう！
           </span>
-          <span style={{ fontFamily: FONT_DISPLAY, fontSize: 60, fontWeight: 700, color: fg }}>
-            {correctCount}
-            <span style={{ fontSize: 30, opacity: 0.7 }}>/{QUESTIONS_PER_SHEET}</span>
-          </span>
-          <span style={{ fontFamily: FONT_DISPLAY, fontSize: 18, fontWeight: 700, marginTop: 4, color: fg }}>
+          <span style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 700, color: fg }}>
             {label}
           </span>
 
-          <div
-            style={{
-              marginTop: 10,
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              borderRadius: 999,
-              padding: "8px 18px",
-              backgroundColor: timeMeta(finalSeconds, level).bg,
-            }}
-          >
-            <Clock size={16} color="#FFFFFF" />
-            <span style={{ fontFamily: FONT_DISPLAY, fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>
-              {finalSeconds}びょう ・ {timeMeta(finalSeconds, level).label}
-            </span>
-          </div>
-
-          <div
-            style={{
-              marginTop: 14,
-              display: "flex",
-              alignItems: "baseline",
-              gap: 6,
-              color: fg,
-            }}
-          >
-            <span style={{ fontFamily: FONT_BODY, fontSize: 13, fontWeight: 800, opacity: 0.8 }}>
-              きょう {levelMeta.label} は
-            </span>
-            <span style={{ fontFamily: FONT_DISPLAY, fontSize: 26, fontWeight: 700 }}>
-              {displayCount}
-            </span>
-            <span style={{ fontFamily: FONT_BODY, fontSize: 13, fontWeight: 800, opacity: 0.8 }}>
-              まいめ！
-            </span>
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
+            <div style={statRowStyle}>
+              <Check size={22} strokeWidth={3} color={fg} />
+              <span style={statTextStyle}>
+                せいかい {correctCount}/{QUESTIONS_PER_SHEET}もん
+              </span>
+            </div>
+            <div style={statRowStyle}>
+              <Clock size={22} color={fg} />
+              <span style={statTextStyle}>
+                {finalSeconds}びょう ・ {timeLabel}
+              </span>
+            </div>
+            <div style={statRowStyle}>
+              <Calendar size={22} color={fg} />
+              <span style={statTextStyle}>
+                きょう {displayCount}まいめ
+              </span>
+            </div>
           </div>
         </div>
         <button

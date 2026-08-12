@@ -219,7 +219,7 @@ export default function MenuScreen({
         {/* レベル別 結果一覧 */}
         <div style={{ width: "100%", marginTop: 40, display: "flex", flexDirection: "column", gap: 32 }}>
           {LEVELS.map((lv) => {
-            const lvSheets = mySheets.filter((s) => s.level === lv.id);
+            const lvSheets = mySheets.filter((s) => s.level === lv.id && s.date === todayStr());
             return (
               <div key={lv.id}>
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
@@ -242,7 +242,7 @@ export default function MenuScreen({
                     }}
                   >
                     <p style={{ fontSize: 13, fontWeight: 700, color: COLORS.inkFaint, margin: 0 }}>
-                      まだプリントがありません
+                      きょうはまだプリントがありません
                     </p>
                   </div>
                 ) : (

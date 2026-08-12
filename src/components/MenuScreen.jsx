@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Play, User, Pencil, ChevronDown, ChevronRight } from "lucide-react";
+import { Play, User, Star, Pencil, ChevronDown, ChevronRight } from "lucide-react";
 import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH } from "../constants";
 import { scoreMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
@@ -8,6 +8,7 @@ import DailyCalendar from "./DailyCalendar";
 
 export default function MenuScreen({
   sheets,
+  points,
   selectedLevel,
   onSelectLevel,
   onStart,
@@ -29,6 +30,7 @@ export default function MenuScreen({
   const [renameError, setRenameError] = useState("");
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const mySheets = sheets.filter((s) => s.user === currentUser);
+  const myPoints = points[currentUser] ?? 0;
 
   const handleAddUser = () => {
     const result = onCreateUser(newUserName);
@@ -74,19 +76,36 @@ export default function MenuScreen({
       }}
     >
       <div style={{ width: "100%", maxWidth: 420 }}>
-        {/* 現在のユーザー表示 */}
+        {/* 現在のユーザー表示・ポイント */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 4,
+            justifyContent: "space-between",
             marginBottom: 8,
           }}
         >
-          <User size={13} color={COLORS.inkSoft} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.inkSoft }}>
-            {currentUser} さん
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <User size={13} color={COLORS.inkSoft} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.inkSoft }}>
+              {currentUser} さん
+            </span>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+              backgroundColor: COLORS.levelSelBg,
+              borderRadius: 999,
+              padding: "3px 10px",
+            }}
+          >
+            <Star size={12} color={COLORS.yellow} fill={COLORS.yellow} />
+            <span style={{ fontFamily: FONT_DISPLAY, fontSize: 12, fontWeight: 700, color: COLORS.ink }}>
+              {myPoints}pt
+            </span>
+          </div>
         </div>
 
         <h1

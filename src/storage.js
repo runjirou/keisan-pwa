@@ -2,6 +2,7 @@
 const SHEETS_KEY = "keisan:sheets";
 const SETTINGS_KEY = "keisan:settings";
 const USERS_KEY = "keisan:users";
+const POINTS_KEY = "keisan:points";
 
 export function loadSheets() {
   try {
@@ -53,5 +54,23 @@ export function saveUsers(users) {
     window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
   } catch (e) {
     console.error("ユーザーの保存に失敗しました", e);
+  }
+}
+
+export function loadPoints() {
+  try {
+    const raw = window.localStorage.getItem(POINTS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+export function savePoints(points) {
+  try {
+    window.localStorage.setItem(POINTS_KEY, JSON.stringify(points));
+  } catch (e) {
+    console.error("ポイントの保存に失敗しました", e);
   }
 }

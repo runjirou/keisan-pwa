@@ -1,10 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Check, X, Delete, Clock, Calendar } from "lucide-react";
+import { Check, X, Delete, Clock, Calendar, Star, PartyPopper } from "lucide-react";
 import { COLORS, FONT_DISPLAY, LEVELS } from "../constants";
 import { generateProblem, scoreMeta, timeMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 
-export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack, questionsPerSheet, currentUser }) {
+const BONUS_SHEET_THRESHOLD = 5; // この枚数以上こなした日はボーナスポイント
+const BONUS_POINTS = 2;
+const BONUS_DISPLAY_MS = 2000;
+
+export default function QuizScreen({ level, showTimer, sheets, points, onRecord, onBack, questionsPerSheet, currentUser }) {
   const [index, setIndex] = useState(0); // 0-19
   const [problem, setProblem] = useState(() => generateProblem(level));
   const [buffer, setBuffer] = useState("");
@@ -15,6 +19,10 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
   const [finalSeconds, setFinalSeconds] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
   const [displayCount, setDisplayCount] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [earnedPoints, setEarnedPoints] = useState(1);
+  const [bonusDayCount, setBonusDayCount] = useState(0);
+  const [showBonus, setShowBonus] = useState(false);
 
   const startTimeRef = useRef(Date.now());
   const [liveSeconds, setLiveSeconds] = useState(0);
@@ -38,6 +46,13 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
     }, 120);
     return () => clearInterval(id);
   }, [done, todayCount]);
+
+  // ボーナス演出は数秒表示したら自動で消す
+  useEffect(() => {
+    if (!showBonus) return;
+    const id = setTimeout(() => setShowBonus(false), BONUS_DISPLAY_MS);
+    return () => clearTimeout(id);
+  }, [showBonus]);
 
   const levelMeta = LEVELS.find((l) => l.id === level);
 
@@ -67,8 +82,16 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
         const seconds = Math.round((Date.now() - startTimeRef.current) / 1000);
         const date = todayStr();
         const countBefore = sheets.filter((s) => s.level === level && s.date === date && s.user === currentUser).length;
+        const todayTotalCount = sheets.filter((s) => s.date === date && s.user === currentUser).length + 1;
+        const isBonus = todayTotalCount >= BONUS_SHEET_THRESHOLD;
+        const gained = isBonus ? 1 + BONUS_POINTS : 1;
+        const pointsBefore = points[currentUser] ?? 0;
         setFinalSeconds(seconds);
         setTodayCount(countBefore + 1);
+        setEarnedPoints(gained);
+        setTotalPoints(pointsBefore + gained);
+        setBonusDayCount(todayTotalCount);
+        setShowBonus(isBonus);
         onRecord({ level, score: nextCorrectCount, seconds, date, total: questionsPerSheet, user: currentUser });
         setDone(true);
       } else {
@@ -79,7 +102,7 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
         setLocked(false);
       }
     }, isCorrect ? 500 : 900);
-  }, [locked, buffer, problem, index, level, correctCount, sheets, onRecord, questionsPerSheet, currentUser]);
+  }, [locked, buffer, problem, index, level, correctCount, sheets, points, onRecord, questionsPerSheet, currentUser]);
 
   const cardBorderColor =
     feedback === "correct" ? COLORS.green : feedback === "wrong" ? COLORS.coral : COLORS.cardBorderDefault;
@@ -117,6 +140,50 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
           boxSizing: "border-box",
         }}
       >
+        {showBonus && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 50,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 24,
+              boxSizing: "border-box",
+              backgroundColor: "rgba(44,62,80,0.6)",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 320,
+                borderRadius: 28,
+                padding: "36px 28px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 10,
+                backgroundColor: "#FFFFFF",
+                boxShadow: "0 8px 0 rgba(0,0,0,0.15)",
+                boxSizing: "border-box",
+                textAlign: "center",
+                animation: "pop 0.3s ease-out",
+              }}
+            >
+              <PartyPopper size={48} color={COLORS.yellow} />
+              <span style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 700, color: COLORS.ink }}>
+                きょう {bonusDayCount}まい たっせい！
+              </span>
+              <span style={{ fontFamily: FONT_DISPLAY, fontSize: 15, fontWeight: 700, color: COLORS.inkSoft }}>
+                すごいね！たくさん れんしゅうしたね
+              </span>
+              <span style={{ fontFamily: FONT_DISPLAY, fontSize: 18, fontWeight: 700, color: COLORS.coral }}>
+                ボーナス +{BONUS_POINTS}pt ！
+              </span>
+            </div>
+          </div>
+        )}
         <div
           style={{
             width: "100%",
@@ -153,6 +220,12 @@ export default function QuizScreen({ level, showTimer, sheets, onRecord, onBack,
               <Calendar size={22} color={fg} />
               <span style={statTextStyle}>
                 きょう {displayCount}まいめ
+              </span>
+            </div>
+            <div style={statRowStyle}>
+              <Star size={22} color={fg} fill={fg} />
+              <span style={statTextStyle}>
+                +{earnedPoints}pt ・ ごうけい {totalPoints}pt
               </span>
             </div>
           </div>

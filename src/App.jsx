@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { COLORS, FONT_BODY, QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH } from "./constants";
-import { loadSheets, saveSheets, loadSettings, saveSettings, loadUsers, saveUsers } from "./storage";
+import {
+  loadSheets,
+  saveSheets,
+  loadSettings,
+  saveSettings,
+  loadUsers,
+  saveUsers,
+  loadPoints,
+  savePoints,
+} from "./storage";
 import MenuScreen from "./components/MenuScreen";
 import QuizScreen from "./components/QuizScreen";
 import UserSetupScreen from "./components/UserSetupScreen";
@@ -22,6 +31,7 @@ export default function KeisanApp() {
   const [activeQuestionsPerSheet, setActiveQuestionsPerSheet] = useState(QUESTIONS_PER_SHEET);
 
   const [users, setUsers] = useState(() => loadUsers()); // string[]
+  const [points, setPoints] = useState(() => loadPoints()); // { [user]: number }
   const [currentUser, setCurrentUser] = useState(() => {
     const loadedUsers = loadUsers();
     const settings = loadSettings();
@@ -43,6 +53,28 @@ export default function KeisanApp() {
     saveUsers(users);
   }, [users]);
 
+  useEffect(() => {
+    savePoints(points);
+  }, [points]);
+
+  // ポイントを個別管理する前にプリントを済ませていたユーザーへの一度きりの初期計算
+  // （プリントが1枚以上あるのにポイント未計算のユーザーだけ、1枚=1ptで補完する）
+  useEffect(() => {
+    setPoints((prev) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const u of users) {
+        if (next[u] !== undefined) continue;
+        const sheetCount = sheets.filter((s) => s.user === u).length;
+        if (sheetCount >= 1) {
+          next[u] = sheetCount;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [users, sheets]);
+
   const handleStart = (level) => {
     setActiveLevel(level);
     setActiveQuestionsPerSheet(questionsPerSheet);
@@ -50,7 +82,10 @@ export default function KeisanApp() {
   };
 
   const handleRecord = (entry) => {
+    const todayTotalCount = sheets.filter((s) => s.date === entry.date && s.user === entry.user).length + 1;
+    const earned = todayTotalCount >= 5 ? 3 : 1; // 1pt/枚、5枚以上の日はボーナス+2pt
     setSheets((prev) => [...prev, entry]);
+    setPoints((prev) => ({ ...prev, [entry.user]: (prev[entry.user] ?? 0) + earned }));
   };
 
   const handleBack = () => {
@@ -118,6 +153,7 @@ export default function KeisanApp() {
       {users.length > 0 && screen === "menu" && (
         <MenuScreen
           sheets={sheets}
+          points={points}
           selectedLevel={selectedLevel}
           onSelectLevel={setSelectedLevel}
           onStart={handleStart}
@@ -138,6 +174,7 @@ export default function KeisanApp() {
           level={activeLevel}
           showTimer={showTimer}
           sheets={sheets}
+          points={points}
           onRecord={handleRecord}
           onBack={handleBack}
           questionsPerSheet={activeQuestionsPerSheet}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Play, User, Pencil } from "lucide-react";
+import { Play, User, Pencil, ChevronDown, ChevronRight } from "lucide-react";
 import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH } from "../constants";
 import { scoreMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
@@ -27,6 +27,7 @@ export default function MenuScreen({
   const [editingUser, setEditingUser] = useState(null);
   const [renameValue, setRenameValue] = useState("");
   const [renameError, setRenameError] = useState("");
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
   const mySheets = sheets.filter((s) => s.user === currentUser);
 
   const handleAddUser = () => {
@@ -480,30 +481,55 @@ export default function MenuScreen({
             )}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
-              タイマーを表示
-            </span>
-            <ToggleSwitch checked={showTimer} onChange={onToggleTimer} small />
-          </div>
-
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <button
+              onClick={() => setShowDebugPanel((v) => !v)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 3,
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                alignSelf: "flex-start",
+              }}
+            >
+              {showDebugPanel ? (
+                <ChevronDown size={11} color={COLORS.inkFaint} />
+              ) : (
+                <ChevronRight size={11} color={COLORS.inkFaint} />
+              )}
               <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
-                でばっぐ：出題数
+                debug
               </span>
-              <span style={{ fontFamily: FONT_DISPLAY, fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
-                {questionsPerSheet}もん
-              </span>
-            </div>
-            <input
-              type="range"
-              min={MIN_QUESTIONS_PER_SHEET}
-              max={QUESTIONS_PER_SHEET}
-              value={questionsPerSheet}
-              onChange={(e) => onChangeQuestionsPerSheet(Number(e.target.value))}
-              style={{ width: "100%", height: 14, accentColor: COLORS.teal }}
-            />
+            </button>
+            {showDebugPanel && (
+              <>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+                    タイマーを表示
+                  </span>
+                  <ToggleSwitch checked={showTimer} onChange={onToggleTimer} small />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+                    出題数
+                  </span>
+                  <span style={{ fontFamily: FONT_DISPLAY, fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+                    {questionsPerSheet}もん
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={MIN_QUESTIONS_PER_SHEET}
+                  max={QUESTIONS_PER_SHEET}
+                  value={questionsPerSheet}
+                  onChange={(e) => onChangeQuestionsPerSheet(Number(e.target.value))}
+                  style={{ width: "100%", height: 14, accentColor: COLORS.teal }}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

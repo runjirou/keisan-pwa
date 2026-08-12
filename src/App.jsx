@@ -78,6 +78,23 @@ export default function KeisanApp() {
     return { ok: true };
   };
 
+  const handleRenameUser = (oldName, rawName) => {
+    const trimmed = rawName.trim();
+    if (!trimmed) return { ok: false, error: "なまえを にゅうりょくしてね" };
+    if (trimmed.length > MAX_USER_NAME_LENGTH) {
+      return { ok: false, error: `${MAX_USER_NAME_LENGTH}もじ いないで にゅうりょくしてね` };
+    }
+    if (trimmed !== oldName && users.includes(trimmed)) {
+      return { ok: false, error: "そのなまえは もう あるよ" };
+    }
+    if (trimmed === oldName) return { ok: true };
+
+    setUsers((prev) => prev.map((u) => (u === oldName ? trimmed : u)));
+    setSheets((prev) => prev.map((s) => (s.user === oldName ? { ...s, user: trimmed } : s)));
+    if (currentUser === oldName) setCurrentUser(trimmed);
+    return { ok: true };
+  };
+
   return (
     <div
       style={{
@@ -113,6 +130,7 @@ export default function KeisanApp() {
           currentUser={currentUser}
           onSwitchUser={setCurrentUser}
           onCreateUser={handleCreateUser}
+          onRenameUser={handleRenameUser}
         />
       )}
       {users.length > 0 && screen === "quiz" && (

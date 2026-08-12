@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Play, User } from "lucide-react";
+import { Play, User, Pencil } from "lucide-react";
 import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH } from "../constants";
 import { scoreMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
@@ -20,9 +20,13 @@ export default function MenuScreen({
   currentUser,
   onSwitchUser,
   onCreateUser,
+  onRenameUser,
 }) {
   const [newUserName, setNewUserName] = useState("");
   const [addUserError, setAddUserError] = useState("");
+  const [editingUser, setEditingUser] = useState(null);
+  const [renameValue, setRenameValue] = useState("");
+  const [renameError, setRenameError] = useState("");
   const mySheets = sheets.filter((s) => s.user === currentUser);
 
   const handleAddUser = () => {
@@ -32,6 +36,27 @@ export default function MenuScreen({
       setAddUserError("");
     } else {
       setAddUserError(result.error);
+    }
+  };
+
+  const startRenameUser = (u) => {
+    setEditingUser(u);
+    setRenameValue(u);
+    setRenameError("");
+  };
+
+  const cancelRenameUser = () => {
+    setEditingUser(null);
+    setRenameValue("");
+    setRenameError("");
+  };
+
+  const handleRenameUser = () => {
+    const result = onRenameUser(editingUser, renameValue);
+    if (result.ok) {
+      cancelRenameUser();
+    } else {
+      setRenameError(result.error);
     }
   };
 
@@ -292,25 +317,120 @@ export default function MenuScreen({
             </span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {users.map((u) => (
-                <button
-                  key={u}
-                  onClick={() => onSwitchUser(u)}
-                  style={{
-                    fontFamily: FONT_DISPLAY,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    borderRadius: 999,
-                    border: `2px solid ${u === currentUser ? COLORS.teal : COLORS.keyBorder}`,
-                    backgroundColor: u === currentUser ? COLORS.levelSelBg : "#FFFFFF",
-                    color: COLORS.ink,
-                    padding: "5px 12px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {u}
-                </button>
+                <div key={u} style={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <button
+                    onClick={() => onSwitchUser(u)}
+                    style={{
+                      fontFamily: FONT_DISPLAY,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      borderRadius: 999,
+                      border: `2px solid ${u === currentUser ? COLORS.teal : COLORS.keyBorder}`,
+                      backgroundColor: u === currentUser ? COLORS.levelSelBg : "#FFFFFF",
+                      color: COLORS.ink,
+                      padding: "5px 12px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {u}
+                  </button>
+                  <button
+                    onClick={() => startRenameUser(u)}
+                    aria-label="なまえをへんこう"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 22,
+                      height: 22,
+                      borderRadius: 999,
+                      border: `2px solid ${COLORS.keyBorder}`,
+                      backgroundColor: "#FFFFFF",
+                      color: COLORS.inkSoft,
+                      cursor: "pointer",
+                      padding: 0,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Pencil size={11} />
+                  </button>
+                </div>
               ))}
             </div>
+
+            {editingUser && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkFaint }}>
+                  『{editingUser}』のなまえをへんこう
+                </span>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <input
+                    value={renameValue}
+                    onChange={(e) => {
+                      setRenameValue(e.target.value);
+                      setRenameError("");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleRenameUser();
+                      if (e.key === "Escape") cancelRenameUser();
+                    }}
+                    maxLength={MAX_USER_NAME_LENGTH}
+                    autoFocus
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      fontFamily: FONT_BODY,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      padding: "8px 10px",
+                      borderRadius: 10,
+                      border: `2px solid ${COLORS.keyBorder}`,
+                      boxSizing: "border-box",
+                    }}
+                  />
+                  <button
+                    onClick={handleRenameUser}
+                    style={{
+                      fontFamily: FONT_DISPLAY,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      borderRadius: 10,
+                      border: "none",
+                      backgroundColor: COLORS.teal,
+                      color: "#FFFFFF",
+                      padding: "8px 14px",
+                      cursor: "pointer",
+                      flexShrink: 0,
+                    }}
+                  >
+                    ほぞん
+                  </button>
+                  <button
+                    onClick={cancelRenameUser}
+                    style={{
+                      fontFamily: FONT_DISPLAY,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      borderRadius: 10,
+                      border: `2px solid ${COLORS.keyBorder}`,
+                      backgroundColor: "#FFFFFF",
+                      color: COLORS.inkSoft,
+                      padding: "8px 14px",
+                      cursor: "pointer",
+                      flexShrink: 0,
+                    }}
+                  >
+                    やめる
+                  </button>
+                </div>
+                {renameError && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.coral }}>
+                    {renameError}
+                  </span>
+                )}
+              </div>
+            )}
+
             <div style={{ display: "flex", gap: 6 }}>
               <input
                 value={newUserName}

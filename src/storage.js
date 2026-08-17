@@ -3,6 +3,7 @@ const SHEETS_KEY = "keisan:sheets";
 const SETTINGS_KEY = "keisan:settings";
 const USERS_KEY = "keisan:users";
 const POINTS_KEY = "keisan:points";
+const CHICK_KEY = "keisan:chick";
 
 export function loadSheets() {
   try {
@@ -72,5 +73,23 @@ export function savePoints(points) {
     window.localStorage.setItem(POINTS_KEY, JSON.stringify(points));
   } catch (e) {
     console.error("ポイントの保存に失敗しました", e);
+  }
+}
+
+export function loadChickGrowth() {
+  try {
+    const raw = window.localStorage.getItem(CHICK_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveChickGrowth(chickGrowth) {
+  try {
+    window.localStorage.setItem(CHICK_KEY, JSON.stringify(chickGrowth));
+  } catch (e) {
+    console.error("ひよこの成長記録の保存に失敗しました", e);
   }
 }

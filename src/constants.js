@@ -33,3 +33,18 @@ export const LEVELS = [
 export const TIME_THRESHOLDS = { 1: 40, 2: 60 };
 
 export const MAX_USER_NAME_LENGTH = 10;
+
+// ひよこそだて機能：1回の「あたためる／エサをあげる」で消費するポイント
+export const CHICK_FEED_COST = 5;
+
+// growthRequired は「あたためる／エサをあげる」の累計回数のしきい値
+// ニワトリには進化せず、ひよこのまま最終ステージ（まんまるひよこ）で成長が止まる
+// image は public/images/ 以下のファイル名
+export const CHICK_STAGES = [
+  { id: 0, label: "たまご", growthRequired: 0, image: "tamago.png" },
+  { id: 1, label: "うまれたてひよこ", growthRequired: 3, image: "hiyoko1.png" },
+  { id: 2, label: "ちいさいひよこ", growthRequired: 18, image: "hiyoko2.png" },
+  { id: 3, label: "ひよこ", growthRequired: 39, image: "hiyoko3.png" },
+  { id: 4, label: "おおきいひよこ", growthRequired: 69, image: "hiyoko4.png" },
+  { id: 5, label: "まんまるひよこ", growthRequired: 104, image: "hiyoko5.png" },
+];

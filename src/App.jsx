@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { COLORS, FONT_BODY, QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH } from "./constants";
+import { COLORS, FONT_BODY, QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH, CHICK_FEED_COST } from "./constants";
 import {
   loadSheets,
   saveSheets,
@@ -9,13 +9,16 @@ import {
   saveUsers,
   loadPoints,
   savePoints,
+  loadChickGrowth,
+  saveChickGrowth,
 } from "./storage";
 import MenuScreen from "./components/MenuScreen";
 import QuizScreen from "./components/QuizScreen";
+import ChickScreen from "./components/ChickScreen";
 import UserSetupScreen from "./components/UserSetupScreen";
 
 export default function KeisanApp() {
-  const [screen, setScreen] = useState("menu"); // 'menu' | 'quiz'
+  const [screen, setScreen] = useState("menu"); // 'menu' | 'quiz' | 'chick'
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [activeLevel, setActiveLevel] = useState(1);
   const [sheets, setSheets] = useState(() => loadSheets()); // [{level, score, seconds, date, total, user}]
@@ -32,6 +35,7 @@ export default function KeisanApp() {
 
   const [users, setUsers] = useState(() => loadUsers()); // string[]
   const [points, setPoints] = useState(() => loadPoints()); // { [user]: number }
+  const [chickGrowth, setChickGrowth] = useState(() => loadChickGrowth()); // { [user]: number }
   const [currentUser, setCurrentUser] = useState(() => {
     const loadedUsers = loadUsers();
     const settings = loadSettings();
@@ -56,6 +60,10 @@ export default function KeisanApp() {
   useEffect(() => {
     savePoints(points);
   }, [points]);
+
+  useEffect(() => {
+    saveChickGrowth(chickGrowth);
+  }, [chickGrowth]);
 
   // ポイントを個別管理する前にプリントを済ませていたユーザーへの一度きりの初期計算
   // （プリントが1枚以上あるのにポイント未計算のユーザーだけ、1枚=1ptで補完する）
@@ -90,6 +98,14 @@ export default function KeisanApp() {
 
   const handleBack = () => {
     setScreen("menu");
+  };
+
+  // 最終ステージに到達したあとも、上げた回数をカウントするためエサやり自体は無制限に受け付ける
+  const handleFeedChick = () => {
+    if (!currentUser) return;
+    if ((points[currentUser] ?? 0) < CHICK_FEED_COST) return;
+    setPoints((prev) => ({ ...prev, [currentUser]: (prev[currentUser] ?? 0) - CHICK_FEED_COST }));
+    setChickGrowth((prev) => ({ ...prev, [currentUser]: (prev[currentUser] ?? 0) + 1 }));
   };
 
   const handleReset = () => {
@@ -154,6 +170,7 @@ export default function KeisanApp() {
         <MenuScreen
           sheets={sheets}
           points={points}
+          chickGrowth={chickGrowth[currentUser] ?? 0}
           selectedLevel={selectedLevel}
           onSelectLevel={setSelectedLevel}
           onStart={handleStart}
@@ -167,6 +184,7 @@ export default function KeisanApp() {
           onSwitchUser={setCurrentUser}
           onCreateUser={handleCreateUser}
           onRenameUser={handleRenameUser}
+          onOpenChick={() => setScreen("chick")}
         />
       )}
       {users.length > 0 && screen === "quiz" && (
@@ -179,6 +197,14 @@ export default function KeisanApp() {
           onBack={handleBack}
           questionsPerSheet={activeQuestionsPerSheet}
           currentUser={currentUser}
+        />
+      )}
+      {users.length > 0 && screen === "chick" && (
+        <ChickScreen
+          points={points[currentUser] ?? 0}
+          chickGrowth={chickGrowth[currentUser] ?? 0}
+          onFeed={handleFeedChick}
+          onBack={handleBack}
         />
       )}
     </div>

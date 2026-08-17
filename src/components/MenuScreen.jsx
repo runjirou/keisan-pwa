@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Play, User, Star, Pencil, ChevronDown, ChevronRight } from "lucide-react";
-import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH } from "../constants";
-import { scoreMeta, todayStr } from "../gameLogic";
+import { COLORS, FONT_DISPLAY, FONT_BODY, LEVELS, QUESTIONS_PER_SHEET, MIN_QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH, CHICK_STAGES } from "../constants";
+import { scoreMeta, todayStr, chickStageIndex } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 import ToggleSwitch from "./ToggleSwitch";
 import DailyCalendar from "./DailyCalendar";
+import ChickIllustration from "./ChickIllustration";
 
 export default function MenuScreen({
   sheets,
   points,
+  chickGrowth,
   selectedLevel,
   onSelectLevel,
   onStart,
@@ -22,6 +24,7 @@ export default function MenuScreen({
   onSwitchUser,
   onCreateUser,
   onRenameUser,
+  onOpenChick,
 }) {
   const [newUserName, setNewUserName] = useState("");
   const [addUserError, setAddUserError] = useState("");
@@ -31,6 +34,8 @@ export default function MenuScreen({
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const mySheets = sheets.filter((s) => s.user === currentUser);
   const myPoints = points[currentUser] ?? 0;
+  const myChickStageIndex = chickStageIndex(chickGrowth ?? 0);
+  const myChickStage = CHICK_STAGES[myChickStageIndex];
 
   const handleAddUser = () => {
     const result = onCreateUser(newUserName);
@@ -107,6 +112,37 @@ export default function MenuScreen({
             </span>
           </div>
         </div>
+
+        {/* ひよこそだて機能への入口 */}
+        <button
+          onClick={onOpenChick}
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            borderRadius: 18,
+            border: `2px solid ${COLORS.keyBorder}`,
+            backgroundColor: COLORS.levelSelBg,
+            padding: "10px 14px",
+            marginBottom: 14,
+            cursor: "pointer",
+            boxSizing: "border-box",
+          }}
+        >
+          <div style={{ width: 40, height: 40, flexShrink: 0 }}>
+            <ChickIllustration stage={myChickStageIndex} />
+          </div>
+          <div style={{ flex: 1, textAlign: "left" }}>
+            <div style={{ fontFamily: FONT_DISPLAY, fontSize: 14, fontWeight: 700, color: COLORS.ink }}>
+              ひよこをそだてる
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkSoft, marginTop: 2 }}>
+              いま：{myChickStage.label}
+            </div>
+          </div>
+          <ChevronRight size={18} color={COLORS.inkSoft} />
+        </button>
 
         <h1
           style={{

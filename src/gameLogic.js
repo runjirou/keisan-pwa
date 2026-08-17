@@ -1,4 +1,4 @@
-import { COLORS, TIME_THRESHOLDS } from "./constants";
+import { COLORS, TIME_THRESHOLDS, CHICK_STAGES } from "./constants";
 
 export function todayStr() {
   const d = new Date();
@@ -52,4 +52,13 @@ export function timeMeta(seconds, level) {
   const threshold = TIME_THRESHOLDS[level];
   if (seconds <= threshold) return { bg: COLORS.blue, label: "超すごい！" };
   return { bg: COLORS.green, label: "すごい！" };
+}
+
+// 累計の「あたためる／エサをあげる」回数から、現在のひよこステージの index を求める
+export function chickStageIndex(growth) {
+  let stage = 0;
+  for (let i = 0; i < CHICK_STAGES.length; i++) {
+    if (growth >= CHICK_STAGES[i].growthRequired) stage = i;
+  }
+  return stage;
 }

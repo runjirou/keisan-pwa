@@ -161,7 +161,7 @@ export default function MenuScreen({
         </p>
 
         {/* きょうの枚数（レベル別） */}
-        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
           {LEVELS.map((lv) => {
             const count = mySheets.filter((s) => s.level === lv.id && s.date === todayStr()).length;
             return (

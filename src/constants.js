@@ -27,10 +27,12 @@ export const MIN_QUESTIONS_PER_SHEET = 1; // デバッグ用スライダーの�
 export const LEVELS = [
   { id: 1, label: "レベル1", sub: "たしざん（くりあがりなし）" },
   { id: 2, label: "レベル2", sub: "たしざん（くりあがり中心）" },
+  { id: 3, label: "レベル3", sub: "1けた＋2けたのたしざん" },
+  { id: 4, label: "レベル4", sub: "20までのかずどうしのたしざん" },
 ];
 
 // レベル別のタイム基準（秒）：この秒数以内なら「超すごい！」
-export const TIME_THRESHOLDS = { 1: 40, 2: 60 };
+export const TIME_THRESHOLDS = { 1: 40, 2: 60, 3: 70, 4: 70 };
 
 export const MAX_USER_NAME_LENGTH = 10;
 

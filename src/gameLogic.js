@@ -34,10 +34,31 @@ function genCarry() {
   return { a, b, answer: a + b };
 }
 
+function genOneDigitPlusTwoDigit() {
+  const oneDigit = Math.floor(Math.random() * 9) + 1; // 1〜9
+  const twoDigit = Math.floor(Math.random() * 9) + 11; // 11〜19
+  // 1桁と2桁、どちらが先に来るかをランダムにして表記のバリエーションを出す
+  return Math.random() < 0.5
+    ? { a: oneDigit, b: twoDigit, answer: oneDigit + twoDigit }
+    : { a: twoDigit, b: oneDigit, answer: twoDigit + oneDigit };
+}
+
+function pickUpTo20() {
+  // 2割 1桁（1〜9）／8割 2桁（10〜20）
+  return Math.random() < 0.2 ? Math.floor(Math.random() * 9) + 1 : Math.floor(Math.random() * 11) + 10;
+}
+
+function genUpTo20() {
+  const a = pickUpTo20();
+  const b = pickUpTo20();
+  return { a, b, answer: a + b };
+}
+
 export function generateProblem(level) {
   if (level === 1) return genNoCarry();
-  // レベル2: 8割 繰り上がりあり／2割 繰り上がりなし
-  return Math.random() < 0.8 ? genCarry() : genNoCarry();
+  if (level === 2) return Math.random() < 0.8 ? genCarry() : genNoCarry(); // 8割 繰り上がりあり／2割 繰り上がりなし
+  if (level === 3) return genOneDigitPlusTwoDigit();
+  return genUpTo20(); // レベル4
 }
 
 export function scoreMeta(score, total) {

@@ -83,7 +83,7 @@ export default function QuizScreen({ level, showTimer, sheets, points, onRecord,
         const date = todayStr();
         const countBefore = sheets.filter((s) => s.level === level && s.date === date && s.user === currentUser).length;
         const todayTotalCount = sheets.filter((s) => s.date === date && s.user === currentUser).length + 1;
-        const isBonus = todayTotalCount >= BONUS_SHEET_THRESHOLD;
+        const isBonus = todayTotalCount % BONUS_SHEET_THRESHOLD === 0;
         const gained = isBonus ? 1 + BONUS_POINTS : 1;
         const pointsBefore = points[currentUser] ?? 0;
         setFinalSeconds(seconds);

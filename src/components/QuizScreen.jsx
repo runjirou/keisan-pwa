@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Check, X, Delete, Clock, Calendar, Star, PartyPopper } from "lucide-react";
+import { Check, X, Delete, Clock, Calendar, Star, PartyPopper, ArrowLeft } from "lucide-react";
 import { COLORS, FONT_DISPLAY, LEVELS, BONUS_SHEET_THRESHOLD, BONUS_POINTS } from "../constants";
 import { generateProblem, scoreMeta, timeMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
@@ -21,6 +21,7 @@ export default function QuizScreen({ level, showTimer, sheets, points, onRecord,
   const [earnedPoints, setEarnedPoints] = useState(1);
   const [bonusDayCount, setBonusDayCount] = useState(0);
   const [showBonus, setShowBonus] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const startTimeRef = useRef(Date.now());
   const [liveSeconds, setLiveSeconds] = useState(0);
@@ -267,6 +268,113 @@ export default function QuizScreen({ level, showTimer, sheets, points, onRecord,
         overflowY: "auto",
       }}
     >
+      {/* キャンセルボタン（右上） */}
+      <button
+        onClick={() => setShowCancelConfirm(true)}
+        style={{
+          position: "fixed",
+          top: 16,
+          right: 16,
+          zIndex: 10,
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+          borderRadius: 999,
+          padding: "6px 12px",
+          backgroundColor: COLORS.cardBg,
+          border: `2px solid ${COLORS.keyBorder}`,
+          boxShadow: "0 2px 0 rgba(0,0,0,0.06)",
+          fontFamily: FONT_DISPLAY,
+          fontSize: 13,
+          fontWeight: 700,
+          color: COLORS.inkSoft,
+          cursor: "pointer",
+        }}
+      >
+        <ArrowLeft size={14} color={COLORS.inkSoft} />
+        やめる
+      </button>
+
+      {showCancelConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 50,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+            boxSizing: "border-box",
+            backgroundColor: "rgba(44,62,80,0.6)",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 320,
+              borderRadius: 28,
+              padding: "32px 28px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 8px 0 rgba(0,0,0,0.15)",
+              boxSizing: "border-box",
+              textAlign: "center",
+              animation: "pop 0.3s ease-out",
+            }}
+          >
+            <span style={{ fontFamily: FONT_DISPLAY, fontSize: 18, fontWeight: 700, color: COLORS.ink }}>
+              プリントを やめますか？
+            </span>
+            <span style={{ fontFamily: FONT_DISPLAY, fontSize: 13, fontWeight: 700, color: COLORS.inkSoft }}>
+              ここまでの きろくは のこりません
+            </span>
+            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
+              <button
+                onClick={onBack}
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  width: "100%",
+                  borderRadius: 16,
+                  border: "none",
+                  background: COLORS.coral,
+                  color: "#FFFFFF",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  padding: "14px 0",
+                  boxShadow: "0 4px 0 rgba(0,0,0,0.15)",
+                  cursor: "pointer",
+                }}
+                {...pressHandlers("0 4px 0 rgba(0,0,0,0.15)")}
+              >
+                やめる
+              </button>
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  width: "100%",
+                  borderRadius: 16,
+                  border: `2px solid ${COLORS.keyBorder}`,
+                  background: "#FFFFFF",
+                  color: COLORS.inkSoft,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  padding: "14px 0",
+                  cursor: "pointer",
+                }}
+                {...pressHandlers("none")}
+              >
+                つづける
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 経過タイマー（左上） */}
       {showTimer && (
         <div
@@ -293,7 +401,7 @@ export default function QuizScreen({ level, showTimer, sheets, points, onRecord,
       )}
 
       {/* 進捗バー */}
-      <div style={{ width: "100%", maxWidth: 420 }}>
+      <div style={{ width: "100%", maxWidth: 420, marginTop: 36 }}>
         <div style={{ marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
           <span style={{ fontFamily: FONT_DISPLAY, fontSize: 14, fontWeight: 700, color: COLORS.inkSoft }}>
             {levelMeta.label}

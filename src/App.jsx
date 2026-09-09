@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { COLORS, FONT_BODY, QUESTIONS_PER_SHEET, MAX_USER_NAME_LENGTH, CHICK_FEED_COST } from "./constants";
+import {
+  COLORS,
+  FONT_BODY,
+  QUESTIONS_PER_SHEET,
+  MAX_USER_NAME_LENGTH,
+  CHICK_FEED_COST,
+  BONUS_SHEET_THRESHOLD,
+  BONUS_POINTS,
+} from "./constants";
 import {
   loadSheets,
   saveSheets,
@@ -91,7 +99,8 @@ export default function KeisanApp() {
 
   const handleRecord = (entry) => {
     const todayTotalCount = sheets.filter((s) => s.date === entry.date && s.user === entry.user).length + 1;
-    const earned = todayTotalCount >= 5 ? 3 : 1; // 1pt/枚、5枚以上の日はボーナス+2pt
+    const isBonus = todayTotalCount % BONUS_SHEET_THRESHOLD === 0;
+    const earned = isBonus ? 1 + BONUS_POINTS : 1; // 1pt/枚、5枚ごとにボーナス+5pt
     setSheets((prev) => [...prev, entry]);
     setPoints((prev) => ({ ...prev, [entry.user]: (prev[entry.user] ?? 0) + earned }));
   };

@@ -36,6 +36,10 @@ export const TIME_THRESHOLDS = { 1: 40, 2: 60, 3: 70, 4: 70 };
 
 export const MAX_USER_NAME_LENGTH = 10;
 
+// ポイント付与：プリント1枚ごとに1pt、その日の枚数がこの倍数に達するたびボーナス加算
+export const BONUS_SHEET_THRESHOLD = 5;
+export const BONUS_POINTS = 5;
+
 // ひよこそだて機能：1回の「あたためる／エサをあげる」で消費するポイント
 export const CHICK_FEED_COST = 5;
 

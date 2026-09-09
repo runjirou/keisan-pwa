@@ -1,11 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Check, X, Delete, Clock, Calendar, Star, PartyPopper } from "lucide-react";
-import { COLORS, FONT_DISPLAY, LEVELS } from "../constants";
+import { COLORS, FONT_DISPLAY, LEVELS, BONUS_SHEET_THRESHOLD, BONUS_POINTS } from "../constants";
 import { generateProblem, scoreMeta, timeMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 
-const BONUS_SHEET_THRESHOLD = 5; // この枚数以上こなした日はボーナスポイント
-const BONUS_POINTS = 5;
 const BONUS_DISPLAY_MS = 2000;
 
 export default function QuizScreen({ level, showTimer, sheets, points, onRecord, onBack, questionsPerSheet, currentUser }) {

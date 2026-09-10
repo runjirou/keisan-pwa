@@ -52,3 +52,7 @@ Styling is all inline `style={}` objects using the `COLORS` constant and `FONT_D
 ## Adding a new level or problem type
 
 Levels are declared in the `LEVELS` array (`src/constants.js`) and consumed by `generateProblem()` (`src/gameLogic.js`), `TIME_THRESHOLDS`, and the level-picker grid in `MenuScreen` — a new level needs an entry in `LEVELS`, a threshold in `TIME_THRESHOLDS`, and a branch in `generateProblem()`.
+
+## 言語について
+
+このリポジトリで開発する際のClaude Codeのセッション内チャット、およびプルリクエストの説明文・タイトルは日本語で書くこと。

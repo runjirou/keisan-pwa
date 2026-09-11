@@ -58,7 +58,12 @@ export default function QuizScreen({ level, showTimer, sheets, points, onRecord,
   const pushDigit = (d) => {
     if (locked) return;
     if (buffer.length >= 2) return; // 答えは最大2桁
-    setBuffer((b) => b + String(d));
+    const next = buffer + String(d);
+    setBuffer(next);
+    // 桁数が答えと同じになったら、チェックボタンを押さなくても自動で正誤判定する
+    if (next.length === String(problem.answer).length) {
+      submit(next);
+    }
   };
 
   const backspace = () => {
@@ -66,10 +71,10 @@ export default function QuizScreen({ level, showTimer, sheets, points, onRecord,
     setBuffer((b) => b.slice(0, -1));
   };
 
-  const submit = useCallback(() => {
-    if (locked || buffer === "") return;
+  const submit = useCallback((value = buffer) => {
+    if (locked || value === "") return;
     setLocked(true);
-    const isCorrect = Number(buffer) === problem.answer;
+    const isCorrect = Number(value) === problem.answer;
     const nextCorrectCount = isCorrect ? correctCount + 1 : correctCount;
     if (isCorrect) setCorrectCount(nextCorrectCount);
     setFeedback(isCorrect ? "correct" : "wrong");

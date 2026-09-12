@@ -5,6 +5,7 @@ import { generateProblem, scoreMeta, timeMeta, todayStr } from "../gameLogic";
 import { pressHandlers } from "../pressHandlers";
 
 const BONUS_DISPLAY_MS = 2000;
+const DIGIT_SUBMIT_DELAY_MS = 400; // 桁数がそろってから正誤判定するまでの間（入力した数字が見えるように）
 
 export default function QuizScreen({ level, showTimer, sheets, points, onRecord, onBack, questionsPerSheet, currentUser }) {
   const [index, setIndex] = useState(0); // 0-19
@@ -60,9 +61,11 @@ export default function QuizScreen({ level, showTimer, sheets, points, onRecord,
     if (buffer.length >= 2) return; // 答えは最大2桁
     const next = buffer + String(d);
     setBuffer(next);
-    // 桁数が答えと同じになったら、チェックボタンを押さなくても自動で正誤判定する
+    // 桁数が答えと同じになったら、チェックボタンを押さなくても自動で正誤判定する。
+    // 入力した数字が一瞬で消えないよう、少し間を置いてから判定する
     if (next.length === String(problem.answer).length) {
-      submit(next);
+      setLocked(true);
+      setTimeout(() => submit(next), DIGIT_SUBMIT_DELAY_MS);
     }
   };
 
